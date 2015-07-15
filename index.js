@@ -19,6 +19,7 @@ function Unpack (opts) {
     this._nbit = 0;
     this._byte = 0;
     this._polarity = defined(opts.polarity, 1);
+    this._threshold = defined(opts.threshold, 0.01);
     this._output = Buffer(256);
 }
 
@@ -66,6 +67,7 @@ Unpack.prototype._transform = function (buf, enc, next) {
 Unpack.prototype._transformf32 = function (buf, enc, next) {
     var index = 0;
     for (var i = 0; i < buf.length; i++) {
+        if (Math.abs(buf[i]) < this._threshold) continue;
         var x = buf[i] > 0 ? 1 : 0;
         if (this._polarity < 0) x = !x;
         
