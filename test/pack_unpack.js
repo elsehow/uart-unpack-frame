@@ -3,7 +3,7 @@ var Pack = require('uart-pack-frame');
 var Unpack = require('../');
 var concat = require('concat-stream');
 
-test('pack unpack pipe', function (t) {
+test('pack unpack', function (t) {
     t.plan(1);
     var p = Pack();
     var u = Unpack();
