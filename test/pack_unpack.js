@@ -7,8 +7,17 @@ test('pack unpack pipe', function (t) {
     t.plan(1);
     var p = Pack();
     var u = Unpack();
-    p.pipe(u).pipe(concat(function (body) {
+    u.pipe(concat(function (body) {
         t.equal(body.toString(), 'abcdefg');
     }));
-    p.end('abcdefg');
+    p.write('abc');
+    u.write(p.read(5));
+    u.write(p.read(5));
+    p.write('def');
+    u.write(p.read(1));
+    p.write('g');
+    u.write(p.read(5));
+    u.write(p.read(5));
+    u.write(p.read(5));
+    u.end();
 });
