@@ -18,85 +18,61 @@ function Unpack (opts) {
     this._state = STOP;
     this._nbit = 0;
     this._byte = 0;
+    this._index = 0;
     this._polarity = defined(opts.polarity, 1);
     this._threshold = defined(opts.threshold, 0.01);
     this._output = Buffer(256);
 }
 
 Unpack.prototype._transform = function (buf, enc, next) {
+    this._index = 0;
     if (buf.constructor.name === 'Float32Array') {
-        return this._transformf32(buf, enc, next);
+        for (var i = 0; i < buf.length; i++) {
+            if (Math.abs(buf[i]) < this._threshold) continue;
+            var x = buf[i] > 0 ? 1 : 0;
+            this._tick(x);
+        }
     }
-    var index = 0;
-    for (var i = 0; i < buf.length; i++) {
-        for (var j = 0; j < 8; j++) {
-            var x = (buf[i] >> j) & 1;
-            if (this._polarity < 0) x = !x;
-            
-            if (this._state === STOP && x === 1) {
-                // still stopped
-            }
-            else if (this._state === STOP && x === 0) {
-                // stop -> start transition
-                this._state = START;
-            }
-            else if (this._state === START) {
-                this._state = BYTE;
-                this._nbit = 7;
-                this._byte = x;
-            }
-            else if (this._state === BYTE) {
-                this._byte += x << (8-this._nbit);
-                if (--this._nbit === 0) {
-                    this._output[index++] = this._byte;
-                    if (index >= this._output.length) {
-                        this.push(this._output);
-                        index = 0;
-                    }
-                    this._state = STOP;
-                }
+    else {
+        if (typeof buf === 'string') {
+            buf = Buffer(buf);
+        }
+        for (var i = 0; i < buf.length; i++) {
+            for (var j = 0; j < 8; j++) {
+                var x = (buf[i] >> j) & 1;
+                this._tick(x);
             }
         }
     }
-    if (index > 0) {
-        this.push(Buffer(this._output.slice(0, index)));
+    if (this._index > 0) {
+        this.push(Buffer(this._output.slice(0, this._index)));
     }
     next();
 };
 
-Unpack.prototype._transformf32 = function (buf, enc, next) {
-    var index = 0;
-    for (var i = 0; i < buf.length; i++) {
-        if (Math.abs(buf[i]) < this._threshold) continue;
-        var x = buf[i] > 0 ? 1 : 0;
-        if (this._polarity < 0) x = !x;
-        
-        if (this._state === STOP && x === 1) {
-            // still stopped
-        }
-        else if (this._state === STOP && x === 0) {
-            // stop -> start transition
-            this._state = START;
-        }
-        else if (this._state === START) {
-            this._state = BYTE;
-            this._nbit = 7;
-            this._byte = x;
-        }
-        else if (this._state === BYTE) {
-            this._byte += x << (8-this._nbit);
-            if (--this._nbit === 0) {
-                this._output[index++] = this._byte;
-                if (index >= this._output.length) {
-                    this.push(this._output);
-                    index = 0;
-                }
-                this._state = STOP;
+Unpack.prototype._tick = function (x) {
+    if (this._polarity < 0) x = !x;
+    if (this._state === STOP && x === 1) {
+        // still stopped
+    }
+    else if (this._state === STOP && x === 0) {
+        // stop -> start transition
+        this._state = START;
+    }
+    else if (this._state === START) {
+        this._state = BYTE;
+        this._nbit = 7;
+        this._byte = x;
+    }
+    else if (this._state === BYTE) {
+        this._byte += x << (8-this._nbit);
+        if (--this._nbit === 0) {
+            this._output[this._index++] = this._byte;
+            if (this._index >= this._output.length) {
+                this.push(this._output);
+                this._index = 0;
             }
+            this._state = STOP;
         }
     }
-    if (index > 0) {
-        this.push(Buffer(this._output.slice(0, index)));
-    }
-    next();
 };
