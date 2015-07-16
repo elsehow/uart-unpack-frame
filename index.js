@@ -53,8 +53,8 @@ Unpack.prototype._tick = function (x) {
         this._byte += x << (8-this._nbit);
         if (--this._nbit === 0) {
             this._output[this._index++] = this._byte;
-            if (this._index >= this._output.length) {
-                this.push(this._output);
+            if (this._index === this._output.length) {
+                this.push(Buffer(this._output));
                 this._index = 0;
             }
             this._state = STOP;
