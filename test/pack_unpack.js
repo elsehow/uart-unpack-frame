@@ -1,12 +1,12 @@
 var test = require('tape');
-var Pack = require('uart-pack-frame');
-var Unpack = require('../');
+var pack = require('uart-pack-frame');
+var unpack = require('../');
 var concat = require('concat-stream');
 
 test('pack unpack', function (t) {
     t.plan(1);
-    var p = Pack();
-    var u = Unpack();
+    var p = pack();
+    var u = unpack();
     u.pipe(concat(function (body) {
         t.equal(body.toString(), 'abcdefg');
     }));

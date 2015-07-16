@@ -36,7 +36,7 @@ Unpack.prototype._transform = function (buf, enc, next) {
 };
 
 Unpack.prototype._tick = function (x) {
-    if (this._polarity < 0) x = !x;
+    if (this._polarity < 0) x = 1-x;
     if (this._state === STOP && x === 1) {
         // still stopped
     }

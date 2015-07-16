@@ -1,10 +1,10 @@
-var Unpack = require('../');
+var unpack = require('../');
 var test = require('tape');
 var concat = require('concat-stream');
 
 test('unpack', function (t) {
     t.plan(1);
-    var u = Unpack();
+    var u = unpack();
     u.pipe(concat(function (body) {
         t.equal(body.toString(), 'beep boop\n');
     }));
