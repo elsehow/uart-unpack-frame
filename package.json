@@ -14,21 +14,23 @@
   },
   "devDependencies": {
     "concat-stream": "^1.5.0",
+    "covert": "^1.1.0",
     "tape": "^4.0.0",
     "uart-pack-frame": "^1.3.0"
   },
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "tape test/*.js",
+    "coverage": "covert test/*.js"
   },
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/substack/uart-unpack-frame.git"
   },
   "keywords": [
-    "uart",
-    "serial",
     "frame",
-    "hardware"
+    "hardware",
+    "serial",
+    "uart"
   ],
   "author": "substack",
   "license": "MIT",
