@@ -12,36 +12,21 @@ var BYTE = 3;
 function Unpack (opts) {
     if (!(this instanceof Unpack)) return new Unpack(opts);
     if (!opts) opts = {};
-    Transform.call(this, {
-        writableObjectMode: true
-    });
+    Transform.call(this, opts);
     this._state = STOP;
     this._nbit = 0;
     this._byte = 0;
     this._index = 0;
     this._polarity = defined(opts.polarity, 1);
-    this._threshold = defined(opts.threshold, 0.01);
     this._output = Buffer(256);
 }
 
 Unpack.prototype._transform = function (buf, enc, next) {
     this._index = 0;
-    if (buf.constructor.name === 'Float32Array') {
-        for (var i = 0; i < buf.length; i++) {
-            if (Math.abs(buf[i]) < this._threshold) continue;
-            var x = buf[i] > 0 ? 1 : 0;
+    for (var i = 0; i < buf.length; i++) {
+        for (var j = 0; j < 8; j++) {
+            var x = (buf[i] >> j) & 1;
             this._tick(x);
-        }
-    }
-    else {
-        if (typeof buf === 'string') {
-            buf = Buffer(buf);
-        }
-        for (var i = 0; i < buf.length; i++) {
-            for (var j = 0; j < 8; j++) {
-                var x = (buf[i] >> j) & 1;
-                this._tick(x);
-            }
         }
     }
     if (this._index > 0) {
