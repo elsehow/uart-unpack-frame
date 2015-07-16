@@ -1,6 +1,6 @@
 {
   "name": "uart-unpack-frame",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "unpack UART data used for serial communication",
   "main": "index.js",
   "directories": {
