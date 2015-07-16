@@ -37,7 +37,7 @@ With [npm](https://npmjs.org) do:
 
 ```
 npm install uart-unpack-frame
-``
+```
 
 # license
 
